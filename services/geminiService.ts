@@ -3,11 +3,27 @@ import { Question, Topic } from "../types";
 import { SYLLABUS_CONTENT } from "./syllabusContext";
 import { LEGACY_BOOK_CONTENT } from "./legacyBookContext";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// SAFE MODE: Only initialize AI if a key is actually provided.
+// Since we use static questions mostly, this allows the app to run without configuration.
+const apiKey = process.env.API_KEY || ""; 
+let ai: any = null;
+
+if (apiKey) {
+  try {
+    ai = new GoogleGenAI({ apiKey: apiKey });
+  } catch (e) {
+    console.warn("AI Service could not be initialized (Missing Key). Switching to Offline Mode.");
+  }
+}
 
 const modelName = "gemini-3-flash-preview";
 
 export const generateQuestions = async (topic: Topic, count: number = 5): Promise<Question[]> => {
+  if (!ai) {
+    console.warn("AI Service is not configured. Returning empty array.");
+    return [];
+  }
+
   // Mapping Topic Enum to Syllabus Domains
   let focusInstruction = "";
   

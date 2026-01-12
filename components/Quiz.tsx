@@ -91,6 +91,11 @@ export const Quiz: React.FC<QuizProps> = ({
   const getText = (content: { de: string; en: string }) => content[language];
   const getOptions = (options: { de: string[]; en: string[] }) => options[language];
 
+  // Helper to remove (Wähle X) / (Select X) suffix from question text
+  const cleanQuestionText = (text: string) => {
+    return text.replace(/\s*\((Wähle|Select)\s+\d+\)\s*$/, '');
+  };
+
   // Determine if we are at the very start (Question 1, no answer checked yet)
   const isFirstQuestionUnanswered = currentIndex === 0 && !showExplanation;
 
@@ -156,7 +161,7 @@ export const Quiz: React.FC<QuizProps> = ({
         </div>
 
         <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-2 leading-relaxed">
-          {getText(currentQuestion.text)}
+          {cleanQuestionText(getText(currentQuestion.text))}
         </h2>
         
         <p className="text-sm text-gray-500 mb-6 font-medium italic">
